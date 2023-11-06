@@ -1,0 +1,5 @@
+data_dir: /home/siavash/random/dsseg/data
+processed_dir: /home/siavash/random/dsseg/processed_data
+output_dir: /home/siavash/random/dsseg/output
+model_dir: /home/siavash/random/dsseg/output/train
+sub_dir: ./
