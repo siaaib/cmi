@@ -112,7 +112,7 @@ def make_submission(
     return sub_df
 
 
-@hydra.main(config_path="conf", config_name="inference", version_base="1.2")
+@hydra.main(config_path="conf", config_name="inference_multi", version_base="1.2")
 def main(cfg: DictConfig):
     seed_everything(cfg.seed)
 
