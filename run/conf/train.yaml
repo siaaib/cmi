@@ -24,7 +24,7 @@ downsample_rate: 2
 upsample_rate: 1
 
 # training
-epoch: 50
+epoch: 60
 batch_size: 64
 num_workers: 24
 accelerator: auto
@@ -61,8 +61,10 @@ labels:
 
 # feature
 features:
-  - "anglez"
+  # "anglez"
   - "enmo"
+  - "anglez_sin"
+  - "anglez_cos"
   # - "month_sin"
   # - "month_cos"
   - "hour_sin"
@@ -76,4 +78,4 @@ optimizer:
 
 # scheduler
 scheduler:
-  num_warmup_steps: 0
+  num_warmup_steps: 10
