@@ -29,7 +29,10 @@ def load_model(cfg: DictConfig, fold) -> nn.Module:
     # load weights
     if cfg.weight is not None:
         weight_path = (
-            Path(cfg.dir.model_dir) / cfg.weight["exp_name"] / f"run{fold}" / "best_model.pth"
+            Path(cfg.dir.model_dir)
+            / cfg.weight["exp_name"]
+            / f"run{fold}"
+            / cfg.weight["file_name"]
         )
         model.load_state_dict(torch.load(weight_path))
         print('load weight from "{}"'.format(weight_path))

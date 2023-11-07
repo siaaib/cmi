@@ -24,7 +24,7 @@ downsample_rate: 2
 upsample_rate: 1
 
 # training
-epoch: 60
+epoch: 50
 batch_size: 64
 num_workers: 24
 accelerator: auto
@@ -32,8 +32,8 @@ use_amp: true
 debug: false
 gradient_clip_val: 1.0
 accumulate_grad_batches: 1
-monitor: val_loss
-monitor_mode: min
+monitor: val_score
+monitor_mode: max
 check_val_every_n_epoch: 1
 
 # Dataset
@@ -61,7 +61,7 @@ labels:
 
 # feature
 features:
-  # "anglez"
+  - "anglez"
   - "enmo"
   - "anglez_sin"
   - "anglez_cos"
@@ -78,4 +78,4 @@ optimizer:
 
 # scheduler
 scheduler:
-  num_warmup_steps: 10
+  num_warmup_steps: 0

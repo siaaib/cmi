@@ -22,6 +22,7 @@ n_folds: 5
 weight:
   exp_name: ${exp_name}
   run_name: single
+  file_name: best_model.pth
 
 seed: 42
 duration: 5760 # durationは32の倍数
@@ -53,5 +54,7 @@ labels:
 features:
   - "anglez"
   - "enmo"
+  - "anglez_sin"
+  - "anglez_cos"
   - "hour_sin"
   - "hour_cos"
