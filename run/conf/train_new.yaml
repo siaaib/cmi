@@ -14,7 +14,7 @@ defaults:
   - dir: local
   - model: Spec2DCNN
   - feature_extractor: LSTMFeatureExtractor
-  - decoder: TransformerDecoder
+  - decoder: TransformerDecoderx
   - split: fold_0
 
 seed: 42

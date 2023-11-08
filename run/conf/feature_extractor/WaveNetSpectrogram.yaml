@@ -1,0 +1,11 @@
+name: WaveNetSpectrogram
+base_filters: 64
+wave_layers:
+  - 10
+  - 6
+  - ${downsample_rate}
+wave_block: complete
+kernel_size: 3
+downsample: ${downsample_rate}
+sigmoid: true
+reinit: true

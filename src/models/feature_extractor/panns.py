@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 
 from src.models.feature_extractor.cnn import CNNSpectrogram
+from src.models.feature_extractor.cnn_wave import WaveNetSpectrogram
 from src.models.feature_extractor.spectrogram import SpecFeatureExtractor
 
 
@@ -52,7 +53,7 @@ class PANNsFeatureExtractor(nn.Module):
         """
 
         cnn_img = self.cnn_feature_extractor(x)  # (batch_size, cnn_chans, height, time_steps)
-        spec_img = self.spec_feature_extractor(x)  # (batch_size, in_channels, height, time_steps)
+        spec_img = self.spec_feature_extractor(x[:,:2,:,:])  # (batch_size, in_channels, height, time_steps)
 
         img = torch.cat([cnn_img, spec_img], dim=1)  # (batch_size, out_chans, height, time_steps)
 

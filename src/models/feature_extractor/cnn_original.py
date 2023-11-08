@@ -74,6 +74,7 @@ class CNNSpectrogram(nn.Module):
         """
         # x: (batch_size, in_channels, time_steps)
         out: list[torch.Tensor] = []
+        print(f"input shape: {x.shape}")
         for i in range(self.out_chans):
             out.append(self.spec_conv[i](x))
         img = torch.stack(out, dim=1)  # (batch_size, out_chans, height, time_steps)
@@ -81,5 +82,5 @@ class CNNSpectrogram(nn.Module):
             img = self.pool(img)  # (batch_size, out_chans, height, out_size)
         if self.sigmoid:
             img = img.sigmoid()
+        print(f"output shape: {img.shape}")
         return img
-

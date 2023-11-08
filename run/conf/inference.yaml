@@ -13,7 +13,7 @@ defaults:
   - _self_
   - dir: local
   - model: Spec2DCNN
-  - feature_extractor: CNNSpectrogram
+  - feature_extractor: WaveNetSpectrogram
   - decoder: UNet1DDecoder
 
 exp_name: dummy

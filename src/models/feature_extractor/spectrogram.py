@@ -27,11 +27,14 @@ class SpecFeatureExtractor(nn.Module):
         hop_length: int,
         win_length: Optional[int] = None,
         out_size: Optional[int] = None,
+        sigmoid: bool = True,
     ):
         super().__init__()
         self.height = height
         self.out_chans = in_channels
         n_fft = height * 2 - 1
+        if win_length is None:
+            win_length = n_fft
         self.feature_extractor = nn.Sequential(
             T.Spectrogram(n_fft=n_fft, hop_length=hop_length, win_length=win_length),
             T.AmplitudeToDB(top_db=80),
@@ -41,10 +44,13 @@ class SpecFeatureExtractor(nn.Module):
 
         if self.out_size is not None:
             self.pool = nn.AdaptiveAvgPool2d((None, self.out_size))
+        self.sigmoid = sigmoid
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         img = self.feature_extractor(x)
         if self.out_size is not None:
             img = self.pool(img)
+        if self.sigmoid:
+            img = torch.sigmoid(img)
 
         return img

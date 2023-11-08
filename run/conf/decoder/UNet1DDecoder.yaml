@@ -1,6 +1,6 @@
 name: UNet1DDecoder
 bilinear: false
-se: false
-res: false
+se: True
+res: True
 scale_factor: 2
 dropout: 0.2
