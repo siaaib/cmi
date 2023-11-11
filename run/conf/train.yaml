@@ -13,18 +13,18 @@ defaults:
   - _self_
   - dir: local
   - model: Spec2DCNN
-  - feature_extractor: LSTMFeatureExtractor
-  - decoder: TransformerDecoder
+  - feature_extractor: WaveNetSpectrogram #LSTMFeatureExtractor #
+  - decoder: UNet1DDecoderLSTM #UNet1DDecoder #TransformerDecoder
   - split: fold_0
 
 seed: 42
 exp_name: dummy
-duration: 5760 # duration * 5 = 秒数
+duration: 17280 # duration * 5 = 秒数
 downsample_rate: 2
 upsample_rate: 1
 
 # training
-epoch: 55
+epoch: 50
 batch_size: 32
 num_workers: 24
 accelerator: auto
@@ -37,8 +37,8 @@ monitor_mode: max
 check_val_every_n_epoch: 1
 
 # Dataset
-offset: 10
-sigma: 10
+offset: 9
+sigma: 6
 bg_sampling_rate: 0.5
 
 # augmentation
@@ -71,6 +71,18 @@ features:
   - "hour_cos"
   # - "minute_sin"
   # - "minute_cos"
+  - "anglez_diff_rolling_med_60"
+  - "anglez_diff_rolling_mean_60"
+  - "anglez_diff_rolling_max_min_60"
+  - "enmo_diff_rolling_med_60"
+  - "enmo_diff_rolling_mean_60"
+  - "enmo_diff_rolling_max_min_60"
+  - "anglez_diff_rolling_med_360"
+  - "anglez_diff_rolling_mean_360"
+  - "anglez_diff_rolling_max_min_360"
+  - "enmo_diff_rolling_med_360"
+  - "enmo_diff_rolling_mean_360"
+  - "enmo_diff_rolling_max_min_360"
 
 # optimizer
 optimizer:
@@ -78,4 +90,5 @@ optimizer:
 
 # scheduler
 scheduler:
-  num_warmup_steps: 0
+  num_warmup_steps: 10
+  num_cycles: 2

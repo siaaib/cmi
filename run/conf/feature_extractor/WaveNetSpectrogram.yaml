@@ -7,5 +7,5 @@ wave_layers:
 wave_block: complete
 kernel_size: 3
 downsample: ${downsample_rate}
-sigmoid: true
+sigmoid: false
 reinit: true

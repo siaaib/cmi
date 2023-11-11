@@ -7,7 +7,10 @@ import torch.optim as optim
 from omegaconf import DictConfig
 from pytorch_lightning import LightningModule
 from torchvision.transforms.functional import resize
-from transformers import get_cosine_schedule_with_warmup
+from transformers import (
+    get_cosine_schedule_with_warmup,
+    get_cosine_with_hard_restarts_schedule_with_warmup,
+)
 
 from src.datamodule.seg import nearest_valid_size
 from src.models.common import get_model
@@ -131,7 +134,7 @@ class SegModel(LightningModule):
 
     def configure_optimizers(self):
         optimizer = optim.AdamW(self.parameters(), lr=self.cfg.optimizer.lr)
-        scheduler = get_cosine_schedule_with_warmup(
+        scheduler = get_cosine_with_hard_restarts_schedule_with_warmup(
             optimizer, num_training_steps=self.trainer.max_steps, **self.cfg.scheduler
         )
         return [optimizer], [{"scheduler": scheduler, "interval": "step"}]

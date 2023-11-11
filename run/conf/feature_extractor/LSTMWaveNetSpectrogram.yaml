@@ -1,4 +1,4 @@
-name: WavenetSpectrogramLSTMFeatureExtractor
+name: LSTMWaveNetSpectrogram
 base_filters: 64
 wave_layers:
   - 10
@@ -9,6 +9,3 @@ kernel_size: 3
 downsample: ${downsample_rate}
 sigmoid: true
 reinit: true
-hidden_size: 64
-num_layers: 2
-bidirectional: true

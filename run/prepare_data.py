@@ -29,6 +29,18 @@ FEATURE_NAMES = [
     "month_cos",
     "minute_sin",
     "minute_cos",
+    "anglez_diff_rolling_med_60",
+    "anglez_diff_rolling_mean_60",
+    "anglez_diff_rolling_max_min_60",
+    "enmo_diff_rolling_med_60",
+    "enmo_diff_rolling_mean_60",
+    "enmo_diff_rolling_max_min_60",
+    "anglez_diff_rolling_med_360",
+    "anglez_diff_rolling_mean_360",
+    "anglez_diff_rolling_max_min_360",
+    "enmo_diff_rolling_med_360",
+    "enmo_diff_rolling_mean_360",
+    "enmo_diff_rolling_max_min_360",
 ]
 
 ANGLEZ_MEAN = -8.810476
@@ -44,6 +56,7 @@ def to_coord(x: pl.Expr, max_: int, name: str) -> list[pl.Expr]:
 
     return [x_sin.alias(f"{name}_sin"), x_cos.alias(f"{name}_cos")]
 
+
 def to_rad_coord(x: pl.Expr, name: str) -> list[pl.Expr]:
     rad = x * np.pi / 180
     x_sin = rad.sin()
@@ -51,12 +64,31 @@ def to_rad_coord(x: pl.Expr, name: str) -> list[pl.Expr]:
 
     return [x_sin.alias(f"{name}_sin"), x_cos.alias(f"{name}_cos")]
 
+
+def diff_rolling_feats(x: pl.Expr, window: int, name) -> pl.Expr:
+    x_diff = x.diff(1).abs()
+    x_diff_rolling_med = x_diff.rolling_median(window, center=True).fill_null(0)
+    x_diff_rolling_mean = x_diff.rolling_mean(window, center=True).fill_null(0)
+    x_diff_rolling_max_min = x_diff.rolling_max(window, center=True).fill_null(
+        0
+    ) - x_diff.rolling_min(window, center=True).fill_null(0)
+    return [
+        x_diff_rolling_med.alias(f"{name}_diff_rolling_med_{window}"),
+        x_diff_rolling_mean.alias(f"{name}_diff_rolling_mean_{window}"),
+        x_diff_rolling_max_min.alias(f"{name}_diff_rolling_max_min_{window}"),
+    ]
+
+
 def add_feature(series_df: pl.DataFrame) -> pl.DataFrame:
     series_df = series_df.with_columns(
         *to_coord(pl.col("timestamp").dt.hour(), 24, "hour"),
         *to_coord(pl.col("timestamp").dt.month(), 12, "month"),
         *to_coord(pl.col("timestamp").dt.minute(), 60, "minute"),
         *to_rad_coord(pl.col("anglez_original"), "anglez"),
+        *diff_rolling_feats(pl.col("anglez"), 60, "anglez"),
+        *diff_rolling_feats(pl.col("enmo"), 60, "enmo"),
+        *diff_rolling_feats(pl.col("anglez"), 360, "anglez"),
+        *diff_rolling_feats(pl.col("enmo"), 360, "enmo"),
     ).select("series_id", *FEATURE_NAMES)
     return series_df
 
@@ -101,7 +133,15 @@ def main(cfg: DictConfig):
                 (pl.col("anglez") - ANGLEZ_MEAN) / ANGLEZ_STD,
                 (pl.col("enmo") - ENMO_MEAN) / ENMO_STD,
             )
-            .select([pl.col("series_id"), pl.col("anglez"),pl.col("anglez_original"), pl.col("enmo"), pl.col("timestamp")])
+            .select(
+                [
+                    pl.col("series_id"),
+                    pl.col("anglez"),
+                    pl.col("anglez_original"),
+                    pl.col("enmo"),
+                    pl.col("timestamp"),
+                ]
+            )
             .collect(streaming=True)
             .sort(by=["series_id", "timestamp"])
         )

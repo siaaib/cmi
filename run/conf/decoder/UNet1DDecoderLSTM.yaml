@@ -1,6 +1,6 @@
-name: UNet1DDecoder
+name: UNet1DDecoderLSTM
 bilinear: false
 se: True
 res: True
 scale_factor: 2
-dropout: 0.3
+dropout: 0.25

@@ -13,8 +13,8 @@ defaults:
   - _self_
   - dir: local
   - model: Spec2DCNN
-  - feature_extractor: LSTMFeatureExtractor
-  - decoder: TransformerDecoder
+  - feature_extractor: WaveNetSpectrogram #LSTMFeatureExtractor #
+  - decoder: UNet1DDecoderLSTM
 
 exp_name: dummy
 phase: test
