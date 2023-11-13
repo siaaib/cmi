@@ -14,7 +14,7 @@ defaults:
   - dir: local
   - model: Spec2DCNN
   - feature_extractor: WaveNetSpectrogram #LSTMFeatureExtractor #
-  - decoder: UNet1DDecoderLSTM
+  - decoder: UNet1DDecoderLSTM #UNet1DDecoder #TransformerDecoder
 
 exp_name: dummy
 phase: test
@@ -58,15 +58,27 @@ features:
   - "anglez_cos"
   - "hour_sin"
   - "hour_cos"
+  - "enmo_diff_rolling_med_24"
+  - "enmo_diff_rolling_mean_24"
+  - "enmo_diff_rolling_max_min_24"
+  - "enmo_diff_rolling_std_24"
+  - "enmo_diff_rolling_quantile_25_24"
+  - "enmo_diff_rolling_quantile_975_24"
   - "anglez_diff_rolling_med_60"
   - "anglez_diff_rolling_mean_60"
   - "anglez_diff_rolling_max_min_60"
+  - "anglez_diff_rolling_std_60"
+  - "anglez_diff_rolling_quantile_25_60"
+  - "anglez_diff_rolling_quantile_975_60"
   - "enmo_diff_rolling_med_60"
   - "enmo_diff_rolling_mean_60"
   - "enmo_diff_rolling_max_min_60"
-  - "anglez_diff_rolling_med_360"
-  - "anglez_diff_rolling_mean_360"
-  - "anglez_diff_rolling_max_min_360"
+  - "enmo_diff_rolling_std_60"
+  - "enmo_diff_rolling_quantile_25_60"
+  - "enmo_diff_rolling_quantile_975_60"
   - "enmo_diff_rolling_med_360"
   - "enmo_diff_rolling_mean_360"
   - "enmo_diff_rolling_max_min_360"
+  - "enmo_diff_rolling_std_360"
+  - "enmo_diff_rolling_quantile_25_360"
+  - "enmo_diff_rolling_quantile_975_360"

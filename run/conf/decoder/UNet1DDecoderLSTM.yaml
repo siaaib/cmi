@@ -4,3 +4,4 @@ se: True
 res: True
 scale_factor: 2
 dropout: 0.25
+num_layers: 1

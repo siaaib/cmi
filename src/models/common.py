@@ -136,6 +136,7 @@ def get_decoder(cfg: DictConfig, n_channels: int, n_classes: int, num_timesteps:
             res=cfg.decoder.res,
             scale_factor=cfg.decoder.scale_factor,
             dropout=cfg.decoder.dropout,
+            num_layers=cfg.decoder.num_layers,
         )
     elif cfg.decoder.name == "LSTMDecoder":
         decoder = LSTMDecoder(

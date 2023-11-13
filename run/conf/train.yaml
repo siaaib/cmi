@@ -65,24 +65,32 @@ features:
   - "enmo"
   - "anglez_sin"
   - "anglez_cos"
-  # - "month_sin"
-  # - "month_cos"
   - "hour_sin"
   - "hour_cos"
-  # - "minute_sin"
-  # - "minute_cos"
+  - "enmo_diff_rolling_med_24"
+  - "enmo_diff_rolling_mean_24"
+  - "enmo_diff_rolling_max_min_24"
+  - "enmo_diff_rolling_std_24"
+  - "enmo_diff_rolling_quantile_25_24"
+  - "enmo_diff_rolling_quantile_975_24"
   - "anglez_diff_rolling_med_60"
   - "anglez_diff_rolling_mean_60"
   - "anglez_diff_rolling_max_min_60"
+  - "anglez_diff_rolling_std_60"
+  - "anglez_diff_rolling_quantile_25_60"
+  - "anglez_diff_rolling_quantile_975_60"
   - "enmo_diff_rolling_med_60"
   - "enmo_diff_rolling_mean_60"
   - "enmo_diff_rolling_max_min_60"
-  - "anglez_diff_rolling_med_360"
-  - "anglez_diff_rolling_mean_360"
-  - "anglez_diff_rolling_max_min_360"
+  - "enmo_diff_rolling_std_60"
+  - "enmo_diff_rolling_quantile_25_60"
+  - "enmo_diff_rolling_quantile_975_60"
   - "enmo_diff_rolling_med_360"
   - "enmo_diff_rolling_mean_360"
   - "enmo_diff_rolling_max_min_360"
+  - "enmo_diff_rolling_std_360"
+  - "enmo_diff_rolling_quantile_25_360"
+  - "enmo_diff_rolling_quantile_975_360"
 
 # optimizer
 optimizer:
@@ -90,5 +98,5 @@ optimizer:
 
 # scheduler
 scheduler:
-  num_warmup_steps: 10
-  num_cycles: 2
+  num_warmup_steps: 20
+  #num_cycles: 2

@@ -73,7 +73,7 @@ class Down(nn.Module):
     ):
         super().__init__()
         self.maxpool_conv = nn.Sequential(
-            nn.MaxPool1d(scale_factor),
+            nn.AvgPool1d(scale_factor),
             DoubleConv(in_channels, out_channels, norm=norm, se=se, res=res),
         )
 
@@ -123,6 +123,7 @@ class UNet1DDecoderLSTM(nn.Module):
         res: bool = False,
         scale_factor: int = 2,
         dropout: float = 0.2,
+        num_layers: int = 1,
     ):
         super().__init__()
         self.n_channels = n_channels
@@ -132,6 +133,7 @@ class UNet1DDecoderLSTM(nn.Module):
         self.se = se
         self.res = res
         self.scale_factor = scale_factor
+        self.num_layers = num_layers
 
         factor = 2 if bilinear else 1
         self.inc = DoubleConv(
@@ -152,6 +154,7 @@ class UNet1DDecoderLSTM(nn.Module):
             scale_factor,
             norm=partial(create_layer_norm, length=self.duration // 16),
         )
+
         self.up1 = Up(
             1024,
             512 // factor,
@@ -176,8 +179,8 @@ class UNet1DDecoderLSTM(nn.Module):
         self.up4 = Up(
             128, 64, bilinear, scale_factor, norm=partial(create_layer_norm, length=self.duration)
         )
-        self.gru = nn.GRU(64, 64, bidirectional=True, batch_first=True)
-        self.lstm = nn.LSTM(128, 64, bidirectional=True, batch_first=True)
+        self.gru = nn.GRU(64, 64, 2, bidirectional=True, batch_first=True)
+        self.lstm = nn.LSTM(128, 64, 1, bidirectional=True, batch_first=True)
 
         self.cls = nn.Sequential(
             nn.Conv1d(128, 128, kernel_size=3, padding=1),

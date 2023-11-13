@@ -60,7 +60,7 @@ unzip child-mind-institute-detect-sleep-states.zip
 ### 2. Preprocess data
 
 ```bash
-rye run python -m run/prepare_data.py phase=train,test
+rye run python run/prepare_data.py phase=train
 ```
 
 ## Train Model
@@ -68,7 +68,7 @@ The following commands are for training the model of LB0.714
 ```bash
 rye run python run/train.py downsample_rate=2 duration=5760 exp_name=exp001 batch_size=32
 ```
-CUDA_VISIBLE_DEVICES=0 rye run python run/train.py downsample_rate=2 duration=8640 exp_name=exp001NN batch_size=32 split=fold_0 epoch=60
+CUDA_VISIBLE_DEVICES=1 rye run python run/train.py downsample_rate=2 duration=17280 exp_name=expdc batch_size=32 split=fold_0 epoch=60
 ## Upload Model
 ```bash
 rye run python tools/upload_dataset.py
