@@ -3,9 +3,37 @@ from typing import Optional
 import segmentation_models_pytorch as smp
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from src.augmentation.cutmix import Cutmix
 from src.augmentation.mixup import Mixup
+
+
+class FocalLoss(nn.Module):
+    def __init__(self, alpha=1, gamma=2, reduction="mean", weight=torch.tensor([1.0, 2.0, 2.0])):
+        super(FocalLoss, self).__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.reduction = reduction
+        self.weight = weight
+
+    def forward(self, inputs, targets):
+        if self.weight is not None:
+            BCE_loss = F.binary_cross_entropy_with_logits(
+                inputs, targets, reduction=self.reduction, weight=self.weight
+            )
+        else:
+            BCE_loss = F.binary_cross_entropy_with_logits(
+                inputs, targets, reduction=self.reduction
+            )
+        pt = torch.exp(-BCE_loss)
+        F_loss = self.alpha * (1 - pt) ** self.gamma * BCE_loss
+        if self.reduction == "mean":
+            return torch.mean(F_loss)
+        elif self.reduction == "sum":
+            return torch.sum(F_loss)
+        else:
+            return F_loss
 
 
 class Spec2DCNN(nn.Module):
@@ -30,7 +58,7 @@ class Spec2DCNN(nn.Module):
         self.decoder = decoder
         self.mixup = Mixup(mixup_alpha)
         self.cutmix = Cutmix(cutmix_alpha)
-        self.loss_fn = nn.BCEWithLogitsLoss()
+        self.loss_fn = nn.BCEWithLogitsLoss(weight=torch.tensor([1.0, 5.0, 5.0]))  # sFocalLoss()
 
     def forward(
         self,

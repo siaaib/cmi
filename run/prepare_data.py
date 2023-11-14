@@ -29,30 +29,28 @@ FEATURE_NAMES = [
     "month_cos",
     "minute_sin",
     "minute_cos",
-    "enmo_diff_rolling_med_24",
-    "enmo_diff_rolling_mean_24",
-    "enmo_diff_rolling_max_min_24",
-    "enmo_diff_rolling_std_24",
-    "enmo_diff_rolling_quantile_25_24",
-    "enmo_diff_rolling_quantile_975_24",
+    "anglez_diff",
     "anglez_diff_rolling_med_60",
     "anglez_diff_rolling_mean_60",
+    "anglez_diff_rolling_max_60",
+    "anglez_diff_rolling_min_60",
     "anglez_diff_rolling_max_min_60",
     "anglez_diff_rolling_std_60",
     "anglez_diff_rolling_quantile_25_60",
     "anglez_diff_rolling_quantile_975_60",
+    "enmo_diff",
     "enmo_diff_rolling_med_60",
     "enmo_diff_rolling_mean_60",
+    "enmo_diff_rolling_max_60",
+    "enmo_diff_rolling_min_60",
     "enmo_diff_rolling_max_min_60",
     "enmo_diff_rolling_std_60",
     "enmo_diff_rolling_quantile_25_60",
     "enmo_diff_rolling_quantile_975_60",
-    "enmo_diff_rolling_med_360",
-    "enmo_diff_rolling_mean_360",
-    "enmo_diff_rolling_max_min_360",
-    "enmo_diff_rolling_std_360",
-    "enmo_diff_rolling_quantile_25_360",
-    "enmo_diff_rolling_quantile_975_360",
+    "enmo_shift_3_pos",
+    "enmo_shift_3_neg",
+    "anglez_shift_3_pos",
+    "anglez_shift_3_neg",
 ]
 
 ANGLEZ_MEAN = -8.810476
@@ -69,6 +67,15 @@ def to_coord(x: pl.Expr, max_: int, name: str) -> list[pl.Expr]:
     return [x_sin.alias(f"{name}_sin"), x_cos.alias(f"{name}_cos")]
 
 
+def shift_feats(x: pl.Expr, shift_size: int, name: str) -> list[pl.Expr]:
+    x_shift_pos = x.shift(shift_size).fill_null(0)
+    x_shift_neg = x.shift(-shift_size).fill_null(0)
+    return [
+        x_shift_pos.alias(f"{name}_shift_{shift_size}_pos"),
+        x_shift_neg.alias(f"{name}_shift_{shift_size}_neg"),
+    ]
+
+
 def to_rad_coord(x: pl.Expr, name: str) -> list[pl.Expr]:
     rad = x * np.pi / 180
     x_sin = rad.sin()
@@ -78,7 +85,7 @@ def to_rad_coord(x: pl.Expr, name: str) -> list[pl.Expr]:
 
 
 def diff_rolling_feats(x: pl.Expr, window: int, name) -> pl.Expr:
-    x_diff = x.diff(1).abs()
+    x_diff = x.diff(1).abs().fill_null(0)
     x_diff_rolling_med = x_diff.rolling_median(window, center=True).fill_null(0)
     x_diff_rolling_mean = x_diff.rolling_mean(window, center=True).fill_null(0)
     x_diff_rolling_std = x_diff.rolling_std(window, center=True).fill_null(0)
@@ -88,12 +95,15 @@ def diff_rolling_feats(x: pl.Expr, window: int, name) -> pl.Expr:
     x_diff_rolling_quantile_975 = x_diff_rolling_med.rolling_quantile(
         0.975, "nearest", center=True
     ).fill_null(0)
-    x_diff_rolling_max_min = x_diff.rolling_max(window, center=True).fill_null(
-        0
-    ) - x_diff.rolling_min(window, center=True).fill_null(0)
+    x_diff_rolling_max = x_diff.rolling_max(window, center=True).fill_null(0)
+    x_diff_rolling_min = x_diff.rolling_min(window, center=True).fill_null(0)
+    x_diff_rolling_max_min = x_diff_rolling_max - x_diff_rolling_min
     return [
+        x_diff.alias(f"{name}_diff"),
         x_diff_rolling_med.alias(f"{name}_diff_rolling_med_{window}"),
         x_diff_rolling_mean.alias(f"{name}_diff_rolling_mean_{window}"),
+        x_diff_rolling_max.alias(f"{name}_diff_rolling_max_{window}"),
+        x_diff_rolling_min.alias(f"{name}_diff_rolling_min_{window}"),
         x_diff_rolling_max_min.alias(f"{name}_diff_rolling_max_min_{window}"),
         x_diff_rolling_std.alias(f"{name}_diff_rolling_std_{window}"),
         x_diff_rolling_quantile_25.alias(f"{name}_diff_rolling_quantile_25_{window}"),
@@ -107,10 +117,10 @@ def add_feature(series_df: pl.DataFrame) -> pl.DataFrame:
         *to_coord(pl.col("timestamp").dt.month(), 12, "month"),
         *to_coord(pl.col("timestamp").dt.minute(), 60, "minute"),
         *to_rad_coord(pl.col("anglez_original"), "anglez"),
-        *diff_rolling_feats(pl.col("enmo"), 24, "enmo"),
         *diff_rolling_feats(pl.col("anglez"), 60, "anglez"),
         *diff_rolling_feats(pl.col("enmo"), 60, "enmo"),
-        *diff_rolling_feats(pl.col("enmo"), 360, "enmo"),
+        *shift_feats(pl.col("enmo"), 3, "enmo"),
+        *shift_feats(pl.col("anglez"), 3, "anglez"),
     ).select("series_id", *FEATURE_NAMES)
     return series_df
 

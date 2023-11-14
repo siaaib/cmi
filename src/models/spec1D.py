@@ -21,7 +21,7 @@ class Spec1D(nn.Module):
         self.channels_fc = nn.Linear(feature_extractor.out_chans, 1)
         self.mixup = Mixup(mixup_alpha)
         self.cutmix = Cutmix(cutmix_alpha)
-        self.loss_fn = nn.BCEWithLogitsLoss()
+        self.loss_fn = nn.BCEWithLogitsLoss(weight=torch.tensor([1.0, 5.0, 5.0]))
 
     def forward(
         self,
