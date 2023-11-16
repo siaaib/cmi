@@ -14,7 +14,7 @@ defaults:
   - dir: local
   - model: Spec2DCNN
   - feature_extractor: WaveNetSpectrogram #LSTMFeatureExtractor #
-  - decoder: UNet1DDecoderLSTM #UNet1DDecoder #TransformerDecoder
+  - decoder: UNet1DDecoderLSTM # UNet1DDecoderTransformer# # #UNet1DDecoder
   - split: fold_0
 
 seed: 42
@@ -67,7 +67,6 @@ features:
   - "anglez_cos"
   - "hour_sin"
   - "hour_cos"
-  #- "anglez_diff"
   - "anglez_diff_rolling_med_60"
   - "anglez_diff_rolling_mean_60"
   - "anglez_diff_rolling_max_60"
@@ -85,10 +84,8 @@ features:
   - "enmo_diff_rolling_std_60"
   - "enmo_diff_rolling_quantile_25_60"
   - "enmo_diff_rolling_quantile_975_60"
-  # - "enmo_shift_3_pos"
-  # - "enmo_shift_3_neg"
-  # - "anglez_shift_3_pos"
-  # - "anglez_shift_3_neg"
+
+
 # optimizer
 optimizer:
   lr: 0.0005

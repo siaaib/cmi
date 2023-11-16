@@ -1,0 +1,7 @@
+name: UNet1DDecoderTransformer
+bilinear: false
+se: True
+res: True
+scale_factor: 2
+dropout: 0.25
+num_layers: 1

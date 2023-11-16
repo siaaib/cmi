@@ -9,6 +9,7 @@ from src.models.decoder.transformerdecoder import TransformerDecoder
 from src.models.decoder.transformerdecoderx import TransformerDecoderx
 from src.models.decoder.unet1ddecoder import UNet1DDecoder
 from src.models.decoder.unet1ddecoderlstm import UNet1DDecoderLSTM
+from src.models.decoder.unet1ddecodrtransformer import UNet1DDecoderTransformer
 from src.models.feature_extractor.cnn import CNNSpectrogram
 from src.models.feature_extractor.cnn_wave import WaveNetSpectrogram
 from src.models.feature_extractor.lstm import LSTMFeatureExtractor
@@ -128,6 +129,18 @@ def get_decoder(cfg: DictConfig, n_channels: int, n_classes: int, num_timesteps:
         )
     elif cfg.decoder.name == "UNet1DDecoderLSTM":
         decoder = UNet1DDecoderLSTM(
+            n_channels=n_channels,
+            n_classes=n_classes,
+            duration=num_timesteps,
+            bilinear=cfg.decoder.bilinear,
+            se=cfg.decoder.se,
+            res=cfg.decoder.res,
+            scale_factor=cfg.decoder.scale_factor,
+            dropout=cfg.decoder.dropout,
+            num_layers=cfg.decoder.num_layers,
+        )
+    elif cfg.decoder.name == "UNet1DDecoderTransformer":
+        decoder = UNet1DDecoderTransformer(
             n_channels=n_channels,
             n_classes=n_classes,
             duration=num_timesteps,

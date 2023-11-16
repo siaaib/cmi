@@ -31,9 +31,12 @@ class TransformerDecoder(nn.Module):
         Returns:
             torch.Tensor: (batch_size, n_timesteps, n_classes)
         """
+        print(x.shape) #
         x = self.conv(x)  # (batch_size, n_channels, n_timesteps)
+        print(x.shape)
         x = x.transpose(1, 2)  # (batch_size, n_timesteps, n_channels)
         x = self.transformer_encoder(x)
+        print(x.shape)
         x = self.linear(x)  # (batch_size, n_timesteps, n_classes)
-
+        print(x.shape)
         return x

@@ -1,8 +1,9 @@
 name: WaveNetSpectrogram
 base_filters: 64
 wave_layers:
-  - 10
-  - 6
+  - 12
+  - 8
+  - 4
   - ${downsample_rate}
 wave_block: complete
 kernel_size: 3
