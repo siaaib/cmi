@@ -1,7 +1,14 @@
 import numpy as np
 import polars as pl
-from scipy.signal import find_peaks
+from scipy.signal import find_peaks, butter, filtfilt
+from sklearn.metrics import mean_squared_error
 
+def lpf(wave, fs=12*60*24, fe=60, n=3):
+    nyq = fs / 2.0
+    b, a = butter(1, fe/nyq, btype='low')
+    for i in range(0, n):
+        wave = filtfilt(b, a, wave)
+    return wave
 
 def post_process_for_seg(
     keys: list[str], preds: np.ndarray, score_th: float = 0.01, distance: int = 5000
@@ -25,8 +32,15 @@ def post_process_for_seg(
         this_series_preds = preds[series_idx].reshape(-1, 2)
 
         for i, event_name in enumerate(["onset", "wakeup"]):
+            before_RMSE = np.sqrt(mean_squared_error(this_event_preds, np.zeros_like(this_event_preds)))
             this_event_preds = this_series_preds[:, i]
+            this_event_preds = lpf(this_event_preds)
+            after_RMSE = np.sqrt(mean_squared_error(this_event_preds, np.zeros_like(this_event_preds)))
+            decay_ratio = before_RMSE/after_RMSE
+            print(f"decay_ratio: {decay_ratio}")
+            this_event_preds *= decay_ratio
             steps = find_peaks(this_event_preds, height=score_th, distance=distance)[0]
+
             scores = this_event_preds[steps]
 
             for step, score in zip(steps, scores):

@@ -10,7 +10,7 @@ from src.augmentation.mixup import Mixup
 
 
 class FocalLoss(nn.Module):
-    def __init__(self, alpha=1, gamma=2, reduction="mean", weight=torch.tensor([1.0, 2.0, 2.0])):
+    def __init__(self, alpha=1, gamma=2, reduction="mean", weight=torch.tensor([1.0, 5.0, 5.0])):
         super(FocalLoss, self).__init__()
         self.alpha = alpha
         self.gamma = gamma
@@ -20,12 +20,10 @@ class FocalLoss(nn.Module):
     def forward(self, inputs, targets):
         if self.weight is not None:
             BCE_loss = F.binary_cross_entropy_with_logits(
-                inputs, targets, reduction=self.reduction, weight=self.weight
+                inputs, targets, weight=self.weight.cuda()
             )
         else:
-            BCE_loss = F.binary_cross_entropy_with_logits(
-                inputs, targets, reduction=self.reduction
-            )
+            BCE_loss = F.binary_cross_entropy_with_logits(inputs, targets)
         pt = torch.exp(-BCE_loss)
         F_loss = self.alpha * (1 - pt) ** self.gamma * BCE_loss
         if self.reduction == "mean":
@@ -58,7 +56,7 @@ class Spec2DCNN(nn.Module):
         self.decoder = decoder
         self.mixup = Mixup(mixup_alpha)
         self.cutmix = Cutmix(cutmix_alpha)
-        self.loss_fn = nn.BCEWithLogitsLoss(weight=torch.tensor([1.0, 5.0, 5.0]))  # sFocalLoss()
+        self.loss_fn = nn.BCEWithLogitsLoss(weight=torch.tensor([1.0, 5.0, 5.0]))  #
 
     def forward(
         self,
@@ -81,8 +79,9 @@ class Spec2DCNN(nn.Module):
             x, labels = self.mixup(x, labels)
         if do_cutmix and labels is not None:
             x, labels = self.cutmix(x, labels)
-
+        # x = x.view(x.shape[0], x.shape[1], 512, 1024) 16384
         x = self.encoder(x).squeeze(1)  # (batch_size, height, n_timesteps)
+        # x = x.view(x.shape[0], 64, 8192)
         logits = self.decoder(x)  # (batch_size, n_classes, n_timesteps)
 
         output = {"logits": logits}

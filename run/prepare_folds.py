@@ -30,7 +30,7 @@ for fold_num, (train_index, valid_index) in enumerate(skf.split(ids), start=0):
         "valid_series_ids": [str(x) for x in valid.tolist()],
     }
 
-    yaml_filename = f"/home/siavash/random/dsseg/run/conf/split/fold_{fold_num}.yaml"
+    yaml_filename = f"/home/siavash/random/dssegsecond/run/conf/split/fold_{fold_num}.yaml"
 
     with open(yaml_filename, "w") as file:
         yaml.dump(fold_data, file)

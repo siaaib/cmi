@@ -64,11 +64,12 @@ rye run python run/prepare_data.py phase=train
 ```
 
 ## Train Model
-The following commands are for training the model of LB0.714
+The following commands are for training the model of LB0.714rye run python run/prepare_data.py phase=train
+
 ```bash
 rye run python run/train.py downsample_rate=2 duration=5760 exp_name=exp001 batch_size=32
 ```
-CUDA_VISIBLE_DEVICES=1 rye run python run/train.py downsample_rate=2 duration=17280 exp_name=expfff2 batch_size=32 split=fold_0 epoch=50
+CUDA_VISIBLE_DEVICES=1 rye run python run/train.py downsample_rate=2 duration=17280 exp_name=expnew batch_size=32 split=fold_0 epoch=50
 ## Upload Model
 ```bash
 rye run python tools/upload_dataset.py

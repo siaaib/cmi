@@ -218,11 +218,14 @@ class UNet1DDecoderTransformer(nn.Module):
         self.transformer = TransformerDecoder(
             n_channels,
             128,
-            4,
-            0.0,
+            2,
+            0.2,
             16,
             self.n_classes,
         )
+        self.gru = nn.GRU(64, 64, 2, bidirectional=True, batch_first=True)
+        self.lstm = nn.LSTM(128, 64, 1, bidirectional=True, batch_first=True)
+
         self.cls = nn.Sequential(
             nn.Conv1d(128, 128, kernel_size=3, padding=1),
             nn.ReLU(),
@@ -253,5 +256,11 @@ class UNet1DDecoderTransformer(nn.Module):
         x = self.up2(x, x3)
         x = self.up3(x, x2)
         x = self.up4(x, x1)
-        x = self.transformer(x)
-        return x  # (batch_size, n_timesteps, n_classes)
+        x_transformer = self.transformer(x)
+        x_lstm = x.permute([0, 2, 1])  # b, t, c
+        x_lstm, _ = self.gru(x_lstm)
+        x_lstm, _ = self.lstm(x_lstm)
+        x_lstm = x_lstm.permute([0, 2, 1])  # b, c, t
+        # classifier
+        x_lstm = self.cls(x_lstm).transpose(1, 2)  # (batch_size, n_classes, n_timesteps)
+        return 0.25 * x_transformer + 0.75 * x_lstm
