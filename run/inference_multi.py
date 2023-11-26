@@ -17,7 +17,7 @@ from src.utils.common import trace
 from src.utils.post_process import post_process_for_seg
 
 
-def load_model(cfg: DictConfig, fold) -> nn.Module:
+def load_model(cfg: DictConfig, weight_path) -> nn.Module:
     num_timesteps = nearest_valid_size(int(cfg.duration * cfg.upsample_rate), cfg.downsample_rate)
     model = get_model(
         cfg,
@@ -27,15 +27,8 @@ def load_model(cfg: DictConfig, fold) -> nn.Module:
     )
 
     # load weights
-    if cfg.weight is not None:
-        weight_path = (
-            Path(cfg.dir.model_dir)
-            / cfg.weight["exp_name"]
-            / f"run{fold}"
-            / cfg.weight["file_name"]
-        )
-        model.load_state_dict(torch.load(weight_path))
-        print('load weight from "{}"'.format(weight_path))
+    model.load_state_dict(torch.load(weight_path))
+    print('load weight from "{}"'.format(weight_path))
     return model
 
 
@@ -123,8 +116,8 @@ def main(cfg: DictConfig):
         test_dataloader = get_test_dataloader(cfg)
     with trace("load model"):
         models = []
-        for fold in range(cfg.n_folds):
-            model = load_model(cfg, fold=fold)
+        for model_path in cfg.model_path_list):
+            model = load_model(cfg, model_path)
             models.append(model)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
