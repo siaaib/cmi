@@ -116,7 +116,7 @@ def main(cfg: DictConfig):
         test_dataloader = get_test_dataloader(cfg)
     with trace("load model"):
         models = []
-        for model_path in cfg.model_path_list):
+        for model_path in cfg.model_path_list:
             model = load_model(cfg, model_path)
             models.append(model)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
