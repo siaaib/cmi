@@ -23,6 +23,10 @@ weight:
   exp_name: ${exp_name}
   run_name: single
   file_name: best_model.pth
+model_path_list:
+  - "/kaggle/input/cmi-model-5/exp_latest/run0/best_model.pth"
+  - "/kaggle/input/cmi-model-5/exp_latest/run0/model_weights.pth"
+  
 
 seed: 42
 duration: 5760 # durationは32の倍数
