@@ -26,6 +26,14 @@ weight:
 model_path_list:
   - "/kaggle/input/cmi-model-5/exp_latest/run0/best_model.pth"
   - "/kaggle/input/cmi-model-5/exp_latest/run0/model_weights.pth"
+  - "/kaggle/input/cmi-model-5/exp_latest/run1/best_model.pth"
+  - "/kaggle/input/cmi-model-5/exp_latest/run1/model_weights.pth"
+  - "/kaggle/input/cmi-model-5/exp_latest/run2/best_model.pth"
+  - "/kaggle/input/cmi-model-5/exp_latest/run2/model_weights.pth"
+  - "/kaggle/input/cmi-model-5/exp_latest/run3/best_model.pth"
+  - "/kaggle/input/cmi-model-5/exp_latest/run3/model_weights.pth"
+  - "/kaggle/input/cmi-model-5/exp_latest/run4/best_model.pth"
+  - "/kaggle/input/cmi-model-5/exp_latest/run4/model_weights.pth"
   
 
 seed: 42
