@@ -33,14 +33,7 @@ def post_process_for_seg(
 
         for i, event_name in enumerate(["onset", "wakeup"]):
             this_event_preds = this_series_preds[:, i]
-            before_RMSE = np.sqrt(mean_squared_error(this_event_preds, np.zeros_like(this_event_preds)))
-            this_event_preds = lpf(this_event_preds)
-            after_RMSE = np.sqrt(mean_squared_error(this_event_preds, np.zeros_like(this_event_preds)))
-            decay_ratio = before_RMSE/after_RMSE
-            print(f"decay_ratio: {decay_ratio}")
-            this_event_preds *= decay_ratio
             steps = find_peaks(this_event_preds, height=score_th, distance=distance)[0]
-
             scores = this_event_preds[steps]
 
             for step, score in zip(steps, scores):
