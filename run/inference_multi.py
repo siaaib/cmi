@@ -86,8 +86,8 @@ def inference(
                     if idx == 0:
                         pred = model(x)["logits"].sigmoid()
                     else:
-                        pred *= model(x)["logits"].sigmoid()
-                pred = pred ** (1/len(models))
+                        pred += model(x)["logits"].sigmoid()
+                pred = pred /len(models)
                 pred = resize(
                     pred.detach().cpu(),
                     size=[duration, pred.shape[2]],
