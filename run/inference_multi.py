@@ -43,6 +43,7 @@ def get_test_dataloader(cfg: DictConfig) -> DataLoader:
     """
     feature_dir = Path("/kaggle/working/processed_data/test")
     series_ids = [x.name for x in feature_dir.glob("*")]
+    print(series_ids)
     chunk_features = load_chunk_features(
         duration=cfg.duration,
         feature_names=cfg.features,
