@@ -49,6 +49,7 @@ upsample_rate: 1
 batch_size: 32
 num_workers: 2
 use_amp: true
+average_type: "median"
 
 # augmentation
 augmentation:
