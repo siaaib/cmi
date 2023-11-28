@@ -130,7 +130,7 @@ def main(cfg: DictConfig):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     with trace("inference"):
-        keys, preds = inference(cfg.duration, test_dataloader, models, device, use_amp=cfg.use_amp, 'median')
+        keys, preds = inference(cfg.duration, test_dataloader, models, device, use_amp=cfg.use_amp, average_type=cfg.average_type)
 
     with trace("make submission"):
         sub_df = make_submission(
