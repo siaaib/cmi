@@ -78,16 +78,15 @@ def inference(
                 x = batch["feature"].to(device)
                 all_preds = []               
                 for model in models:
-                    preds = model(x)["logits"].sigmoid()
-                    # Append the predictions to the list
-                    all_preds.append(preds)
+                    pred = model(x)["logits"].sigmoid()
+                    all_preds.append(pred)
 
                 all_preds = torch.stack(all_preds, dim=0)
                 if average_type == 'median':
                     pred, _ = torch.median(all_preds, dim=0)
                 elif average_type == 'mean':
                     pred = torch.mean(all_preds, dim=0)
-                else:
+                elif average_type == 'both':
                     pred = (torch.median(all_preds, dim=0)[0] + torch.mean(all_preds, dim=0))/2
                 pred = resize(
                     pred.detach().cpu(),
