@@ -76,12 +76,15 @@ def inference(
         with torch.no_grad():
             with torch.cuda.amp.autocast(enabled=use_amp):
                 x = batch["feature"].to(device)
-                for idx, model in enumerate(models):
-                    if idx == 0:
-                        pred = model(x)["logits"].sigmoid()
-                    else:
-                        pred += model(x)["logits"].sigmoid()
-                pred = pred /len(models)
+                all_preds = []               
+                for model in models:
+                    preds = model(x)["logits"].sigmoid()
+                    # Append the predictions to the list
+                    all_preds.append(preds)
+
+                all_preds = torch.stack(all_preds, dim=0)
+
+                pred, _ = torch.median(all_preds, dim=0)
                 pred = resize(
                     pred.detach().cpu(),
                     size=[duration, pred.shape[2]],
