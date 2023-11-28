@@ -64,7 +64,7 @@ def get_test_dataloader(cfg: DictConfig) -> DataLoader:
 
 
 def inference(
-    duration: int, loader: DataLoader, models: nn.Module, device: torch.device, use_amp
+    duration: int, loader: DataLoader, models: nn.Module, device: torch.device, use_amp, average_type
 ) -> tuple[list[str], np.ndarray]:
     for model in models:
         model = model.to(device)
@@ -83,8 +83,12 @@ def inference(
                     all_preds.append(preds)
 
                 all_preds = torch.stack(all_preds, dim=0)
-
-                pred, _ = torch.median(all_preds, dim=0)
+                if average_type == 'median':
+                    pred, _ = torch.median(all_preds, dim=0)
+                elif average_type == 'mean':
+                    pred = torch.mean(all_preds, dim=0)
+                else:
+                    pred = (torch.median(all_preds, dim=0)[0] + torch.mean(all_preds, dim=0))/2
                 pred = resize(
                     pred.detach().cpu(),
                     size=[duration, pred.shape[2]],
@@ -126,7 +130,7 @@ def main(cfg: DictConfig):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     with trace("inference"):
-        keys, preds = inference(cfg.duration, test_dataloader, models, device, use_amp=cfg.use_amp)
+        keys, preds = inference(cfg.duration, test_dataloader, models, device, use_amp=cfg.use_amp, 'median')
 
     with trace("make submission"):
         sub_df = make_submission(
