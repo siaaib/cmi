@@ -25,40 +25,41 @@ FEATURE_NAMES = [
     "enmo",
     "hour_sin",
     "hour_cos",
-    "month_sin",
-    "month_cos",
-    "minute_sin",
-    "minute_cos",
-    "anglez_diff",
-    "anglez_diff_rolling_med_60",
-    "anglez_diff_rolling_mean_60",
-    "anglez_diff_rolling_max_60",
-    "anglez_diff_rolling_min_60",
-    "anglez_diff_rolling_max_min_60",
-    "anglez_diff_rolling_std_60",
-    "anglez_diff_rolling_quantile_25_60",
-    "anglez_diff_rolling_quantile_975_60",
-    "enmo_diff",
-    "enmo_diff_rolling_med_60",
-    "enmo_diff_rolling_mean_60",
-    "enmo_diff_rolling_max_60",
-    "enmo_diff_rolling_min_60",
-    "enmo_diff_rolling_max_min_60",
-    "enmo_diff_rolling_std_60",
-    "enmo_diff_rolling_quantile_25_60",
-    "enmo_diff_rolling_quantile_975_60",
-    "anglez_diff_rolling_med_30",
-    "anglez_diff_rolling_mean_30",
-    "anglez_diff_rolling_max_min_30",
-    "anglez_diff_rolling_std_30",
-    "anglez_diff_rolling_quantile_25_30",
-    "anglez_diff_rolling_quantile_975_30",
-    "enmo_diff_rolling_med_30",
-    "enmo_diff_rolling_mean_30",
-    "enmo_diff_rolling_max_min_30",
-    "enmo_diff_rolling_std_30",
-    "enmo_diff_rolling_quantile_25_30",
-    "enmo_diff_rolling_quantile_975_30",
+    "minute",
+    "anglez_diff_rolling_med_65",
+    "anglez_diff_rolling_mean_65",
+    "anglez_diff_rolling_max_65",
+    "anglez_diff_rolling_std_65",
+    "enmo_diff_rolling_med_65",
+    "enmo_diff_rolling_mean_65",
+    "enmo_diff_rolling_max_65",
+    "enmo_diff_rolling_std_65",
+    "anglez_diff_rolling_med_33",
+    "anglez_diff_rolling_mean_33",
+    "anglez_diff_rolling_max_33",
+    "anglez_diff_rolling_std_33",
+    "enmo_diff_rolling_med_33",
+    "enmo_diff_rolling_mean_33",
+    "enmo_diff_rolling_max_33",
+    "enmo_diff_rolling_std_33",
+    "anglez_diff_rolling_med_17",
+    "anglez_diff_rolling_mean_17",
+    "anglez_diff_rolling_max_17",
+    "anglez_diff_rolling_std_17",
+    "enmo_diff_rolling_med_17",
+    "enmo_diff_rolling_mean_17",
+    "enmo_diff_rolling_max_17",
+    "enmo_diff_rolling_std_17",
+    "anglez_diff_1",
+    "anglez_diff_2",
+    "anglez_diff_4",
+    "anglez_diff_8",
+    "anglez_diff_16",
+    "enmo_diff_1",
+    "enmo_diff_2",
+    "enmo_diff_4",
+    "enmo_diff_8",
+    "enmo_diff_16",
 ]
 
 ANGLEZ_MEAN = -8.810476
@@ -82,54 +83,50 @@ def to_rad_coord(x: pl.Expr, name: str) -> list[pl.Expr]:
 
     return [x_sin.alias(f"{name}_sin"), x_cos.alias(f"{name}_cos")]
 
+def minute_is_important(x: pl.Expr) -> pl.Expr:
+    result = (x % 15).cast(pl.Int8)
+    return [result.alias("minute")]
 
-def diff_rolling_feats(x: pl.Expr, window: int, name, limited: bool = False) -> pl.Expr:
+def diff_rolling_feats(x: pl.Expr, window: int, name) -> pl.Expr:
     x_diff = x.diff(1).abs().fill_null(0)
     x_diff_rolling_med = x_diff.rolling_median(window, center=True).fill_null(0)
     x_diff_rolling_mean = x_diff.rolling_mean(window, center=True).fill_null(0)
     x_diff_rolling_std = x_diff.rolling_std(window, center=True).fill_null(0)
-    x_diff_rolling_quantile_25 = x_diff_rolling_med.rolling_quantile(
-        0.025, "nearest", center=True
-    ).fill_null(0)
-    x_diff_rolling_quantile_975 = x_diff_rolling_med.rolling_quantile(
-        0.975, "nearest", center=True
-    ).fill_null(0)
     x_diff_rolling_max = x_diff.rolling_max(window, center=True).fill_null(0)
-    x_diff_rolling_min = x_diff.rolling_min(window, center=True).fill_null(0)
-    x_diff_rolling_max_min = x_diff_rolling_max - x_diff_rolling_min
-    if not limited:
-        return [
-            x_diff.alias(f"{name}_diff"),
-            x_diff_rolling_med.alias(f"{name}_diff_rolling_med_{window}"),
-            x_diff_rolling_mean.alias(f"{name}_diff_rolling_mean_{window}"),
-            x_diff_rolling_max.alias(f"{name}_diff_rolling_max_{window}"),
-            x_diff_rolling_min.alias(f"{name}_diff_rolling_min_{window}"),
-            x_diff_rolling_max_min.alias(f"{name}_diff_rolling_max_min_{window}"),
-            x_diff_rolling_std.alias(f"{name}_diff_rolling_std_{window}"),
-            x_diff_rolling_quantile_25.alias(f"{name}_diff_rolling_quantile_25_{window}"),
-            x_diff_rolling_quantile_975.alias(f"{name}_diff_rolling_quantile_975_{window}"),
-        ]
-    else:
-        return [
-            x_diff_rolling_med.alias(f"{name}_diff_rolling_med_{window}"),
-            x_diff_rolling_mean.alias(f"{name}_diff_rolling_mean_{window}"),
-            x_diff_rolling_max_min.alias(f"{name}_diff_rolling_max_min_{window}"),
-            x_diff_rolling_std.alias(f"{name}_diff_rolling_std_{window}"),
-            x_diff_rolling_quantile_25.alias(f"{name}_diff_rolling_quantile_25_{window}"),
-            x_diff_rolling_quantile_975.alias(f"{name}_diff_rolling_quantile_975_{window}"),
-        ]
+    return [
+        x_diff_rolling_med.alias(f"{name}_diff_rolling_med_{window}"),
+        x_diff_rolling_mean.alias(f"{name}_diff_rolling_mean_{window}"),
+        x_diff_rolling_max.alias(f"{name}_diff_rolling_max_{window}"),
+        x_diff_rolling_std.alias(f"{name}_diff_rolling_std_{window}"),
+    ]
 
+def diff_feats(x: pl.Expr, name) -> pl.Expr:
+    x_diff_1 = x.diff(1).abs().fill_null(0)
+    x_diff_2 = x.diff(2).abs().fill_null(0)
+    x_diff_4 = x.diff(4).abs().fill_null(0)
+    x_diff_8 = x.diff(8).abs().fill_null(0)
+    x_diff_16 = x.diff(16).abs().fill_null(0)
+
+    return [
+        x_diff_1.alias(f"{name}_diff_1"),
+        x_diff_2.alias(f"{name}_diff_2"),
+        x_diff_4.alias(f"{name}_diff_4"),
+        x_diff_8.alias(f"{name}_diff_8"),
+        x_diff_16.alias(f"{name}_diff_16")]
 
 def add_feature(series_df: pl.DataFrame) -> pl.DataFrame:
     series_df = series_df.with_columns(
         *to_coord(pl.col("timestamp").dt.hour(), 24, "hour"),
-        *to_coord(pl.col("timestamp").dt.month(), 12, "month"),
-        *to_coord(pl.col("timestamp").dt.minute(), 60, "minute"),
+        *minute_is_important(pl.col("timestamp").dt.minute()),
         *to_rad_coord(pl.col("anglez_original"), "anglez"),
-        *diff_rolling_feats(pl.col("anglez"), 60, "anglez", False),
-        *diff_rolling_feats(pl.col("enmo"), 60, "enmo", False),
-        *diff_rolling_feats(pl.col("anglez"), 30, "anglez", True),
-        *diff_rolling_feats(pl.col("enmo"), 30, "enmo", True),
+        *diff_rolling_feats(pl.col("anglez"), 65, "anglez"),
+        *diff_rolling_feats(pl.col("enmo"), 65, "enmo"),
+        *diff_rolling_feats(pl.col("anglez"), 33, "anglez"),
+        *diff_rolling_feats(pl.col("enmo"), 33, "enmo"),
+        *diff_rolling_feats(pl.col("anglez"), 17, "anglez"),
+        *diff_rolling_feats(pl.col("enmo"), 17, "enmo"),
+        *diff_feats(pl.col("anglez"), "anglez"),
+        *diff_feats(pl.col("enmo"), "enmo"),
     ).select("series_id", *FEATURE_NAMES)
     return series_df
 
