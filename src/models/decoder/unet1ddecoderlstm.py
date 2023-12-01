@@ -137,22 +137,22 @@ class UNet1DDecoderLSTM(nn.Module):
 
         factor = 2 if bilinear else 1
         self.inc = DoubleConv(
-            self.n_channels, 64, norm=partial(create_layer_norm, length=self.duration)
+            self.n_channels, 128, norm=partial(create_layer_norm, length=self.duration)
         )
         self.down1 = Down(
             64, 128, scale_factor, norm=partial(create_layer_norm, length=self.duration // 2)
         )
         self.down2 = Down(
-            128, 256, scale_factor, norm=partial(create_layer_norm, length=self.duration // 4)
+            128, 256, scale_factor, norm=partial(create_layer_norm, length=self.duration // 2)
         )
         self.down3 = Down(
-            256, 512, scale_factor, norm=partial(create_layer_norm, length=self.duration // 8)
+            256, 512, scale_factor, norm=partial(create_layer_norm, length=self.duration // 4)
         )
         self.down4 = Down(
             512,
             1024 // factor,
             scale_factor,
-            norm=partial(create_layer_norm, length=self.duration // 16),
+            norm=partial(create_layer_norm, length=self.duration // 8),
         )
 
         self.up1 = Up(
@@ -160,32 +160,29 @@ class UNet1DDecoderLSTM(nn.Module):
             512 // factor,
             bilinear,
             scale_factor,
-            norm=partial(create_layer_norm, length=self.duration // 8),
+            norm=partial(create_layer_norm, length=self.duration // 4),
         )
         self.up2 = Up(
             512,
             256 // factor,
             bilinear,
             scale_factor,
-            norm=partial(create_layer_norm, length=self.duration // 4),
+            norm=partial(create_layer_norm, length=self.duration // 2),
         )
         self.up3 = Up(
             256,
             128 // factor,
             bilinear,
             scale_factor,
-            norm=partial(create_layer_norm, length=self.duration // 2),
+            norm=partial(create_layer_norm, length=self.duration),
         )
-        self.up4 = Up(
-            128, 64, bilinear, scale_factor, norm=partial(create_layer_norm, length=self.duration)
-        )
-        self.gru = nn.GRU(64, 64, 2, bidirectional=True, batch_first=True)
-        self.lstm = nn.LSTM(128, 64, 1, bidirectional=True, batch_first=True)
+        self.gru = nn.GRU(128, 128, 2, bidirectional=True, batch_first=True)
+        self.lstm = nn.LSTM(256, 128, 1, bidirectional=True, batch_first=True)
 
         self.cls = nn.Sequential(
-            nn.Conv1d(128, 128, kernel_size=3, padding=1),
+            nn.Conv1d(256, 256, kernel_size=3, padding=1),
             nn.ReLU(),
-            nn.Conv1d(128, self.n_classes, kernel_size=1, padding=0),
+            nn.Conv1d(256, self.n_classes, kernel_size=1, padding=0),
             nn.Dropout(dropout),
         )
         self.loss_fn = nn.BCEWithLogitsLoss()
@@ -204,14 +201,13 @@ class UNet1DDecoderLSTM(nn.Module):
 
         # 1D U-Net
         x1 = self.inc(x)
-        x2 = self.down1(x1)
-        x3 = self.down2(x2)
+        #x2 = self.down1(x1)
+        x3 = self.down2(x1)
         x4 = self.down3(x3)
         x = self.down4(x4)
         x = self.up1(x, x4)
         x = self.up2(x, x3)
-        x = self.up3(x, x2)
-        x = self.up4(x, x1)
+        x = self.up3(x, x1)
         x = x.permute([0, 2, 1])  # b, t, c
         x, _ = self.gru(x)
         x, _ = self.lstm(x)
