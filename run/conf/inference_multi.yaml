@@ -30,7 +30,9 @@ model_path_list:
   - "/kaggle/input/cmi-model-14/expfeatd10/runf7/best_model.pth"
   - "/kaggle/input/cmi-model-14/expfeatd10/runf8/best_model.pth"
   - "/kaggle/input/cmi-model-14/expfeatd10/runf9/best_model.pth"
-  
+  - "/kaggle/input/cmi-model-14/exp_f1t/runf3/best_model.pth"
+  - "/kaggle/input/cmi-model-14/exp_f1t/runf10/best_model.pth"
+  - "/kaggle/input/cmi-model-14/exp_f1t/runf11/best_model.pth"
 
 seed: 42
 duration: 17280 
