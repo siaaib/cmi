@@ -115,8 +115,6 @@ def add_feature(series_df: pl.DataFrame) -> pl.DataFrame:
         *diff_rolling_feats(pl.col("enmo"), 65, "enmo"),
         *diff_rolling_feats(pl.col("anglez"), 33, "anglez"),
         *diff_rolling_feats(pl.col("enmo"), 33, "enmo"),
-        *diff_rolling_feats(pl.col("anglez"), 17, "anglez"),
-        *diff_rolling_feats(pl.col("enmo"), 17, "enmo"),
         *diff_feats(pl.col("anglez"), "anglez"),
         *diff_feats(pl.col("enmo"), "enmo"),
     ).select("series_id", *FEATURE_NAMES)
